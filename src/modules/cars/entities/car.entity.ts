@@ -1,1 +1,3 @@
-export class Car {}
+export class Car {
+  car: boolean;
+}
