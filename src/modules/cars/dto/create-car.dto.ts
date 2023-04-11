@@ -1,3 +1,3 @@
 export class CreateCarDto {
-  car: boolean;
+  isTest: boolean;
 }
