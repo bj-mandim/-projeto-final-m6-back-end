@@ -11,6 +11,8 @@ export class CarsService {
   constructor(@InjectRepository(Car) private repository: Repository<Car>) {}
 
   async create(createCarDto: CreateCarDto): Promise<Car> {
+    createCarDto.fipe_table = Number(createCarDto.fipe_table);
+    createCarDto.price = Number(createCarDto.price);
     return this.repository.save(createCarDto);
   }
 
