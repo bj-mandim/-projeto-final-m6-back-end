@@ -29,13 +29,13 @@ export class Car {
   @Column()
   km: number;
 
-  @Column()
+  @Column('float')
   fipe_table: number;
 
   @Column()
   color: string;
 
-  @Column()
+  @Column('float')
   price: number;
 
   @Column()
