@@ -1,26 +1,45 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { Car } from './entities/car.entity';
 
 @Injectable()
 export class CarsService {
-  create(createCarDto: CreateCarDto) {
-    return 'This action adds a new car';
+  constructor(@InjectRepository(Car) private repository: Repository<Car>) {}
+
+  async create(createCarDto: CreateCarDto): Promise<Car> {
+    return this.repository.save(createCarDto);
   }
 
-  findAll() {
-    return `This action returns all cars`;
+  async findAll(): Promise<Car[]> {
+    const list = await this.repository.find();
+    return list;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} car`;
+  async findOne(id: string): Promise<Car> {
+    const car = await this.repository.findOne({ where: { id } });
+
+    if (!car) {
+      throw new Error(`Car not found`);
+    }
+
+    return car;
   }
 
-  update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
+  async update(id: string, updateCarDto: UpdateCarDto): Promise<Car> {
+    await this.findOne(id);
+
+    await this.repository.update({ id }, updateCarDto);
+
+    return await this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} car`;
+  async remove(id: string): Promise<void> {
+    await this.findOne(id);
+
+    await this.repository.delete({ id });
   }
 }
