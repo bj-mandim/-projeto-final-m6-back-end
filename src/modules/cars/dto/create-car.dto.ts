@@ -1,5 +1,6 @@
+/*
 import { Image } from '../entities/image.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../entities/user.entity'; */
 
 export class CreateCarDto {
   brand: string;
@@ -11,7 +12,8 @@ export class CreateCarDto {
   color: string;
   price: number;
   description: string;
+  /*
   images: Image[];
   user: User;
-  comments: Comment[];
+  comments: Comment[]; */
 }
