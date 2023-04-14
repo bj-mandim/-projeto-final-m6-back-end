@@ -16,39 +16,30 @@ export class CarsService {
 
   async create(createCarDto: CreateCarDto): Promise<Car> {
     createCarDto.fipe_table = Number(createCarDto.fipe_table);
-
     createCarDto.price = Number(createCarDto.price);
 
-    let car = this.repository.create(createCarDto);
+    const car = this.repository.create(createCarDto);
     await this.repository.save(car);
 
-    // createCarDto.images.forEach(async (image) => {
-    //   const createdImg = this.imgRepository.create({ ...image, car: car });
-    //   const test = await this.imgRepository.save(createdImg);
-    //   console.log(test.id);
-    // });
+    await this.createImg(createCarDto.images, car);
 
-    await this.createImg(createCarDto.images, car).then(async () => {
-      car = await this.findOne(car.id);
-    });
-    return car;
+    return await this.findOne(car.id);
   }
 
   async createImg(images: ImageDto[], car: Car): Promise<void> {
-    images.forEach((image) => {
-      const createdImg = this.imgRepository.create({ ...image, car: car });
-      this.imgRepository.save(createdImg);
-    });
+    const imagesList = images.map((image) =>
+      this.imgRepository.create({ ...image, car: car }),
+    );
+    await this.imgRepository.save(imagesList);
   }
 
   async findAll(): Promise<Car[]> {
     const list = await this.repository.find();
+
     return list;
   }
 
   async findOne(id: string): Promise<Car> {
-    // const car = await this.repository.findOne({ where: { id } });
-
     const car = await this.repository
       .createQueryBuilder('car')
       .where('car.id = :id_car', { id_car: id })
@@ -59,13 +50,17 @@ export class CarsService {
       throw new Error(`Car not found`);
     }
 
-    console.log(car.id);
-
     return car;
   }
 
   async update(id: string, updateCarDto: UpdateCarDto): Promise<Car> {
-    await this.findOne(id);
+    const car = await this.findOne(id);
+
+    if (updateCarDto.images) {
+      //Verificar sobre apagar imagens antigas
+      await this.createImg(updateCarDto.images, car);
+      delete updateCarDto.images;
+    }
 
     await this.repository.update({ id }, updateCarDto);
 
