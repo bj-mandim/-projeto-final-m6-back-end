@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -21,16 +21,9 @@ export class CarsService {
     const car = this.repository.create(createCarDto);
     await this.repository.save(car);
 
-    await this.createImg(createCarDto.images, car);
+    await this.createImg(createCarDto.images, car.id);
 
     return await this.findOne(car.id);
-  }
-
-  async createImg(images: ImageDto[], car: Car): Promise<void> {
-    const imagesList = images.map((image) =>
-      this.imgRepository.create({ ...image, car: car }),
-    );
-    await this.imgRepository.save(imagesList);
   }
 
   async findAll(): Promise<Car[]> {
@@ -47,18 +40,14 @@ export class CarsService {
       .getOne();
 
     if (!car) {
-      throw new Error(`Car not found`);
+      throw new NotFoundException(`Car not found`);
     }
 
     return car;
   }
 
   async update(id: string, updateCarDto: UpdateCarDto): Promise<Car> {
-    const car = await this.findOne(id);
-
     if (updateCarDto.images) {
-      //Verificar sobre apagar imagens antigas
-      await this.createImg(updateCarDto.images, car);
       delete updateCarDto.images;
     }
 
@@ -71,5 +60,31 @@ export class CarsService {
     await this.findOne(id);
 
     await this.repository.delete({ id });
+  }
+
+  async createImg(images: ImageDto[], carId: string): Promise<Image[]> {
+    const car = await this.findOne(carId);
+
+    const imagesList = images.map((image) =>
+      this.imgRepository.create({ ...image, car: car }),
+    );
+    await this.imgRepository.save(imagesList);
+
+    return await this.imgRepository
+      .createQueryBuilder('images')
+      .where('images.car.id = :id_car', { id_car: carId })
+      .getMany();
+  }
+
+  async removeImg(id: string): Promise<void> {
+    const image = await this.imgRepository
+      .createQueryBuilder('images')
+      .where('images.id = :id_image', { id_image: id })
+      .getOne();
+
+    if (!image) {
+      throw new NotFoundException(`Image not found`);
+    }
+    await this.imgRepository.delete({ id });
   }
 }

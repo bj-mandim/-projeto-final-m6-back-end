@@ -78,3 +78,10 @@ export class ImageDto {
   @IsString()
   url: string;
 }
+
+export class ImageListDto {
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => ImageDto)
+  images: ImageDto[];
+}

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 
 import { CarsService } from './cars.service';
-import { CreateCarDto } from './dto/create-car.dto';
+import { CreateCarDto, ImageListDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 // import { CarSchema } from 'src/schemas/car.schema';
 
@@ -40,5 +40,15 @@ export class CarsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.carsService.remove(id);
+  }
+
+  @Post(':id/images')
+  createImg(@Body() imageListDto: ImageListDto, @Param('id') id: string) {
+    return this.carsService.createImg(imageListDto.images, id);
+  }
+
+  @Delete('/images/:id')
+  deleteImg(@Param('id') id: string) {
+    return this.carsService.removeImg(id);
   }
 }
