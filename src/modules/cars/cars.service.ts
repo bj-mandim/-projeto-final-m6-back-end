@@ -2,27 +2,49 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateCarDto } from './dto/create-car.dto';
+import { CreateCarDto, ImageDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { Car } from './entities/car.entity';
+import { Image } from './entities/image.entity';
 
 @Injectable()
 export class CarsService {
-  constructor(@InjectRepository(Car) private repository: Repository<Car>) {}
+  constructor(
+    @InjectRepository(Car) private repository: Repository<Car>,
+    @InjectRepository(Image) private imgRepository: Repository<Image>,
+  ) {}
 
   async create(createCarDto: CreateCarDto): Promise<Car> {
     createCarDto.fipe_table = Number(createCarDto.fipe_table);
     createCarDto.price = Number(createCarDto.price);
-    return this.repository.save(createCarDto);
+
+    const car = this.repository.create(createCarDto);
+    await this.repository.save(car);
+
+    await this.createImg(createCarDto.images, car);
+
+    return await this.findOne(car.id);
+  }
+
+  async createImg(images: ImageDto[], car: Car): Promise<void> {
+    const imagesList = images.map((image) =>
+      this.imgRepository.create({ ...image, car: car }),
+    );
+    await this.imgRepository.save(imagesList);
   }
 
   async findAll(): Promise<Car[]> {
     const list = await this.repository.find();
+
     return list;
   }
 
   async findOne(id: string): Promise<Car> {
-    const car = await this.repository.findOne({ where: { id } });
+    const car = await this.repository
+      .createQueryBuilder('car')
+      .where('car.id = :id_car', { id_car: id })
+      .leftJoinAndSelect('car.images', 'images')
+      .getOne();
 
     if (!car) {
       throw new Error(`Car not found`);
@@ -32,7 +54,13 @@ export class CarsService {
   }
 
   async update(id: string, updateCarDto: UpdateCarDto): Promise<Car> {
-    await this.findOne(id);
+    const car = await this.findOne(id);
+
+    if (updateCarDto.images) {
+      //Verificar sobre apagar imagens antigas
+      await this.createImg(updateCarDto.images, car);
+      delete updateCarDto.images;
+    }
 
     await this.repository.update({ id }, updateCarDto);
 
