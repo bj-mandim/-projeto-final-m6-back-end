@@ -19,19 +19,18 @@ com outros membros a partir da aba comentários.
 
 ## Bibliotecas utilizadas:
 
-- @nestjs/cli
-- @nestjs/schematics
-- @nestjs/testing"
+- cli;
+- testing";
+- mapped-types;
+- platform-express;
 - cors;
 - dotenv;
 - typeORM;
-- @nestjs/common;
-- pg;
-- reflect-metadata;
-- express-async-errors;
+- common;
 - class-transformer;
-- nodemon;
-- Swagger IU;
+- class-validator;
+- pg
+- reflect-metadata;
 
 ### Para fazer o clone do repositório e rodar o projeto localmente:
 
@@ -42,8 +41,8 @@ com outros membros a partir da aba comentários.
 
 ### Projeto Criado e desenvolvido por: 
 
-Amanda: https://github.com/AmandaIsMe-alt
-Gabriel: https://github.com/Dukine
-Mandim: https://github.com/bj-mandim
-Mateus: https://github.com/MateusSantanna
-Elias: https://github.com/ebrgs
+1. Amanda: https://github.com/AmandaIsMe-alt
+2. Gabriel: https://github.com/Dukine
+3. Beatriz: https://github.com/bj-mandim
+4. Mateus: https://github.com/MateusSantanna
+5. Elias: https://github.com/ebrgs
