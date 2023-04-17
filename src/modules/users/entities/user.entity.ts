@@ -6,9 +6,10 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Car } from './car.entity';
+
+import { Car } from 'src/modules/cars/entities/car.entity';
 import { Address } from './address.entity';
-import { Comment } from './comment.entity';
+import { Comment } from 'src/modules/cars/entities/comment.entity';
 import { Exclude } from 'class-transformer';
 //Fazer um yarn add class-transformer
 

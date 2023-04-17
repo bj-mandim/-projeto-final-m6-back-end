@@ -5,9 +5,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Car } from './car.entity';
 
-import { User } from './user.entity';
+import { Car } from './car.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity('comment')
 export class Comment {

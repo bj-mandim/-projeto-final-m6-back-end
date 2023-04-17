@@ -8,7 +8,8 @@ import {
 
 import { Comment } from './comment.entity';
 import { Image } from './image.entity';
-import { User } from './user.entity';
+import { User } from 'src/modules/users/entities/user.entity';
+
 @Entity('cars')
 export class Car {
   @PrimaryGeneratedColumn('uuid')
