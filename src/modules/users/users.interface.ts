@@ -9,7 +9,3 @@ export interface UserData {
   cpf: string;
   birth: string;
 }
-
-export interface UserRegister {
-  user: UserData;
-}
