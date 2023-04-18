@@ -29,7 +29,8 @@ export class CarsController {
   @UseGuards(TokenAuthGuard, AnnouncerGuard)
   create(@Body() createCarDto: CreateCarDto, @Request() req: iTokenRequest) {
     const userId = req.userId;
-    return this.carsService.create(createCarDto);
+    // const userId = '4ac3b570-351b-4077-ae74-356007249ff0';
+    return this.carsService.create(createCarDto, userId);
   }
 
   @Get()
