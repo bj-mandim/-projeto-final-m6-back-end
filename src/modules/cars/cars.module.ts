@@ -10,5 +10,6 @@ import { Image } from './entities/image.entity';
   imports: [TypeOrmModule.forFeature([Car, Image])],
   controllers: [CarsController],
   providers: [CarsService],
+  exports: [CarsService],
 })
 export class CarsModule {}
