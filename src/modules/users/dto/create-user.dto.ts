@@ -1,89 +1,56 @@
-import {
-  IsString,
-  MaxLength,
-  IsBoolean,
-  IsInt,
-  IsNotEmpty,
-  ValidateNested,
-  IsNumber,
-} from 'class-validator';
+import { IAddressCreateRequest } from './create-adress.dto';
 
-export class CreateUserDto {
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  @ValidateNested()
+export interface IUserLogin {
   email: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @MaxLength(11)
-  @ValidateNested()
-  @IsInt()
-  cpf: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @MaxLength(120)
-  @IsInt()
-  phone: number;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  description: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  @ValidateNested()
   password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @IsInt()
-  birth: string;
-
-  @IsBoolean()
-  is_announcer: boolean;
 }
 
-export class AdressUserDTO {
-  @IsNotEmpty()
-  @IsNumber()
-  @MaxLength(11)
-  @ValidateNested()
-  @IsInt()
-  cep: number;
+export interface IUserCreateRequest {
+  name: string;
+  cpf: string;
+  email: string;
+  password: string;
+  phone: string;
+  description: string;
+  birth: Date;
+  image_url: string;
+  is_announcer: boolean;
+  address: IAddressCreateRequest;
+}
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  state: string;
+export interface IUserUpdateRequest {
+  name?: string;
+  cpf?: string;
+  email?: string;
+  password?: string;
+  phone?: string;
+  description?: string;
+  birth?: Date;
+  image_url?: string;
+  is_announcer?: boolean;
+}
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  city: string;
+export interface IUserAddressResponse {
+  id: string;
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  description: string;
+  birth: Date;
+  image_url: string;
+  is_announcer: boolean;
+  address: IAddressCreateRequest;
+}
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  street: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @MaxLength(120)
-  @IsInt()
-  number: number;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(120)
-  complement: string;
+export interface IUserResponse {
+  id: string;
+  name: string;
+  cpf: string;
+  email: string;
+  phone: string;
+  description: string;
+  birth: Date;
+  image_url: string;
+  is_announcer: boolean;
 }

@@ -22,9 +22,8 @@ model Car {
   cover_img    String
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String          @db.Uuid
-  comments     Comment[]
+  comment     Comment[]
   images       Image[]
-  @@map("car")
 }
 
 model Image {
@@ -32,7 +31,6 @@ model Image {
   url           String
   car           Car @relation(fields: [carId], references: [id], onDelete: Cascade)
   carId         String  @db.Uuid
-  @@map("image")
 }
 
 model Comment {
@@ -43,7 +41,6 @@ model Comment {
   created_at    DateTime    @default(now())
   car           Car @relation(fields: [carId], references: [id], onDelete: Cascade)
   carId         String      @db.Uuid
-  @@map("comment")
 }
 
 model User {
@@ -56,7 +53,6 @@ model User {
   description     String
   is_announcer    Boolean
   password        String
-  anouncements    Anouncement[]
+  car             Car[]
   comments        Comment[]
-  @@map("user")
 }

@@ -1,99 +1,88 @@
 // import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import createUserSerializer from 'src/serializer/userSerializer';
 import { hash } from 'bcryptjs';
-import { AppError } from 'src/errors/appErro';
+import { prisma } from '../../../prisma';
+import {
+  IUserAddressResponse,
+  IUserCreateRequest,
+  IUserUpdateRequest,
+} from './dto/create-user.dto';
+import {
+  listUsersResponseSerializer,
+  userAddressResponseSerializer,
+} from 'src/serializer/userSerializer';
 
-const prisma = new PrismaClient();
+export const createUserService = async ({
+  name,
+  email,
+  password,
+  birth,
+  cpf,
+  image_url,
+  is_announcer,
+  phone,
+  description,
+  address,
+}: IUserCreateRequest): Promise<IUserAddressResponse> => {
+  const hashPassword = await hash(password, 10);
 
-export const createUserService = async (data: CreateUserDto) => {
-  const serializerUser = await createUserSerializer.validate(data, {
-    stripUnknown: true,
-    abortEarly: false,
-  });
-
-  const {
-    name,
-    email,
-    cpf,
-    phone,
-    description,
-    is_announcer,
-    password,
-    birth,
-  } = serializerUser;
-
-  const userAlreadyExists = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-
-  const cpfAlreadyExists = await prisma.user.findUnique({
-    where: {
-      cpf,
-    },
-  });
-
-  if (userAlreadyExists) {
-    throw new AppError('User already exists!', 403);
-  }
-  if (cpfAlreadyExists) {
-    throw new AppError('Cpf already exists!', 403);
-  }
-
-  const hashedPassword = await hash(password, 10);
-
-  const createData = await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       name,
       email,
+      password: hashPassword,
+      birth,
       cpf,
+      image_url,
+      is_announcer,
       phone,
       description,
-      is_announcer,
-      password: hashedPassword,
-      birth,
-    },
-    include: {
-      cars: true,
     },
   });
-  await createUserSerializer.validate(createData, {
+
+  const newAddress = await prisma.address.create({
+    data: {
+      city: address.city,
+      number: address.number,
+      state: address.state,
+      street: address.state,
+      cep: address.cep,
+      complement: address.complement,
+      user_id: newUser.id,
+    },
+  });
+
+  const result = {
+    ...newUser,
+    address: newAddress,
+  };
+
+  const validatedData = userAddressResponseSerializer.validate(result, {
     stripUnknown: true,
   });
 
-  const userWithoutPassword = exclude(createData, ['password']);
-
-  return userWithoutPassword;
+  return validatedData;
 };
 
-function exclude<User, Key extends keyof User>(
-  user: User,
-  keys: Key[],
-): Omit<User, Key> {
-  for (const key of keys) {
-    delete user[key];
-  }
-  return user;
-}
-
-export const listUserService = async () => {
+export const listUserService = async (): Promise<IUserAddressResponse[]> => {
   const getUser = await prisma.user.findMany({
     include: {
       cars: true,
       comments: true,
+      address: true,
     },
   });
 
-  return getUser;
+  const validatedData = await listUsersResponseSerializer.validate(getUser, {
+    stripUnknown: true,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return validatedData!;
 };
 
 export const updateUserService = async (
   userId: string,
-  data: UpdateUserDto,
+  data: IUserUpdateRequest,
 ) => {
   const updateUser = await prisma.user.update({
     where: { id: userId },
