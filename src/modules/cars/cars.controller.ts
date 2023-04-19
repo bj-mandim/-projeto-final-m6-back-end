@@ -19,8 +19,7 @@ import { CarOwnerGuard } from '../auth/car-owner.guard';
 import { ImageOwnerGuard } from '../auth/image-owner.guard';
 
 interface iTokenRequest extends Request {
-  userId: string;
-  isAnnouncer: boolean;
+  user: { userId: string; isAnnouncer: boolean };
 }
 
 @Controller('cars')
@@ -30,8 +29,7 @@ export class CarsController {
   @Post()
   @UseGuards(TokenAuthGuard, AnnouncerGuard)
   create(@Body() createCarDto: CreateCarDto, @Request() req: iTokenRequest) {
-    const userId = req.userId;
-    // const userId = '4ac3b570-351b-4077-ae74-356007249ff0';
+    const userId = req.user.userId;
     return this.carsService.create(createCarDto, userId);
   }
 

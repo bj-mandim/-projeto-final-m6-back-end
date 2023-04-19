@@ -3,8 +3,9 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 
 interface iPayload {
-  userId: string;
-  isAnnouncer: boolean;
+  email: string;
+  sub: string;
+  is_announcer: string;
 }
 
 @Injectable()
@@ -18,7 +19,7 @@ export class TokenStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: iPayload) {
-    const { userId, isAnnouncer } = payload;
-    return { userId, isAnnouncer };
+    const { sub, is_announcer } = payload;
+    return { userId: sub, isAnnouncer: is_announcer };
   }
 }

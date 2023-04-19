@@ -10,6 +10,6 @@ export class ImageOwnerGuard implements CanActivate {
 
     const image = await this.carsService.findImage(request.params.id);
 
-    return image.car.user.id == request.userId;
+    return image.car.user.id == request.user.userId;
   }
 }
