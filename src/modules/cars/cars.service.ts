@@ -92,4 +92,20 @@ export class CarsService {
     }
     await this.imgRepository.delete({ id });
   }
+
+  async findImage(id: string): Promise<Image> {
+    const image = await this.imgRepository
+      .createQueryBuilder('image')
+      .where('image.id = :id_image', { id_image: id })
+      .leftJoinAndSelect('image.car', 'car')
+      .leftJoinAndSelect('car.user', 'user')
+      .getOne();
+
+    if (!image) {
+      throw new NotFoundException(`image not found`);
+    }
+
+    console.log(image.car.user.id);
+    return image;
+  }
 }

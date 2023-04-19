@@ -15,6 +15,8 @@ import { CreateCarDto, ImageListDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { AnnouncerGuard } from '../auth/announcer.guard';
+import { CarOwnerGuard } from '../auth/car-owner.guard';
+import { ImageOwnerGuard } from '../auth/image-owner.guard';
 
 interface iTokenRequest extends Request {
   userId: string;
@@ -40,31 +42,31 @@ export class CarsController {
   }
 
   @Get(':id')
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, CarOwnerGuard)
   findOne(@Param('id') id: string) {
     return this.carsService.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, CarOwnerGuard)
   update(@Param('id') id: string, @Body() updateCarDto: UpdateCarDto) {
     return this.carsService.update(id, updateCarDto);
   }
 
   @Delete(':id')
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, CarOwnerGuard)
   remove(@Param('id') id: string) {
     return this.carsService.remove(id);
   }
 
   @Post(':id/images')
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, CarOwnerGuard)
   createImg(@Body() imageListDto: ImageListDto, @Param('id') id: string) {
     return this.carsService.createImg(imageListDto.images, id);
   }
 
   @Delete('/images/:id')
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, ImageOwnerGuard)
   deleteImg(@Param('id') id: string) {
     return this.carsService.removeImg(id);
   }
