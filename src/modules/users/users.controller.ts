@@ -1,9 +1,18 @@
-import { Request, Response } from 'express';
-import { AppError } from 'src/errors/appErro';
-import { createUserService } from './users.service';
-import { listUserService } from './users.service';
-import { updateUserService } from './users.service';
-import { deleteUserService } from './users.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { TokenAuthGuard } from '../auth/token-auth.guard';
+import { SelfGuard } from '../auth/self.guard';
 
 export const createUserController = async (req: Request, res: Response) => {
   try {
@@ -32,31 +41,22 @@ export const listUserController = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserController = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-    const data = req.body;
-    const user = await updateUserService(id, data);
-    return res.status(200).json(user);
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(400).json({
-        message: error.message,
-      });
-    }
+  @Get(':id')
+  @UseGuards(TokenAuthGuard, SelfGuard)
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(TokenAuthGuard, SelfGuard)
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
   }
 };
 
-export const deleteUserController = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-    await deleteUserService(id);
-    return res.status(204).json({ message: 'User deleted ^-^' });
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(400).json({
-        message: error.message,
-      });
-    }
+  @Delete(':id')
+  @UseGuards(TokenAuthGuard, SelfGuard)
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
-};
+}

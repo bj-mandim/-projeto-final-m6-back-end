@@ -1,100 +1,61 @@
-// import { Injectable } from '@nestjs/common';
-import { hash } from 'bcryptjs';
-import { prisma } from '../../../prisma';
-import {
-  IUserAddressResponse,
-  IUserCreateRequest,
-  IUserUpdateRequest,
-} from './dto/create-user.dto';
-import {
-  listUsersResponseSerializer,
-  userAddressResponseSerializer,
-} from 'src/serializer/userSerializer';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 
-export const createUserService = async ({
-  name,
-  email,
-  password,
-  birth,
-  cpf,
-  image_url,
-  is_announcer,
-  phone,
-  description,
-  address,
-}: IUserCreateRequest): Promise<IUserAddressResponse> => {
-  const hashPassword = await hash(password, 10);
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
 
-  const newUser = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashPassword,
-      birth,
-      cpf,
-      image_url,
-      is_announcer,
-      phone,
-      description,
-    },
-  });
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto);
+    await this.usersRepository.save(user);
 
-  const newAddress = await prisma.address.create({
-    data: {
-      city: address.city,
-      number: address.number,
-      state: address.state,
-      street: address.state,
-      cep: address.cep,
-      complement: address.complement,
-      user_id: newUser.id,
-    },
-  });
+    return await this.findOne(user.id);
+  }
 
-  const result = {
-    ...newUser,
-    address: newAddress,
-  };
+  async findAll(): Promise<User[]> {
+    const list = await this.usersRepository.find();
 
-  const validatedData = userAddressResponseSerializer.validate(result, {
-    stripUnknown: true,
-  });
+    return list;
+  }
 
-  return validatedData;
-};
+  async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id_user', { id_user: id })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
 
-export const listUserService = async (): Promise<IUserAddressResponse[]> => {
-  const getUser = await prisma.user.findMany({
-    include: {
-      cars: true,
-      comments: true,
-      address: true,
-    },
-  });
+    return user;
+  }
 
-  const validatedData = await listUsersResponseSerializer.validate(getUser, {
-    stripUnknown: true,
-  });
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.usersRepository.update({ id }, updateUserDto);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return validatedData!;
-};
+    return await this.findOne(id);
+  }
 
-export const updateUserService = async (
-  userId: string,
-  data: IUserUpdateRequest,
-) => {
-  const updateUser = await prisma.user.update({
-    where: { id: userId },
-    data: data,
-  });
-  return updateUser;
-};
+  async remove(id: string): Promise<void> {
+    await this.findOne(id);
 
-export const deleteUserService = (userId: string) => {
-  const deleteUser = prisma.user.delete({
-    where: { id: userId },
-  });
+    await this.usersRepository.delete({ id });
+  }
 
-  return deleteUser;
-};
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email_user', { email_user: email })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+    return user;
+  }
+}
