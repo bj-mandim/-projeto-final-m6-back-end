@@ -1,42 +1,62 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Request, Response } from 'express';
+import { AppError } from 'src/errors/appErro';
+import { createUserService } from './users.service';
+import { listUserService } from './users.service';
+import { updateUserService } from './users.service';
+import { deleteUserService } from './users.service';
 
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+export const createUserController = async (req: Request, res: Response) => {
+  try {
+    const { ...data } = req.body;
+    const newUser = await createUserService(data);
+    return res.status(201).json(newUser);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
   }
+};
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+export const listUserController = async (req: Request, res: Response) => {
+  try {
+    const user = await listUserService();
+    return res.status(200).json(user);
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
   }
+};
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+export const updateUserController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    const user = await updateUserService(id, data);
+    return res.status(200).json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
   }
+};
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+export const deleteUserController = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    await deleteUserService(id);
+    return res.status(204).json({ message: 'User deleted ^-^' });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-}
+};
