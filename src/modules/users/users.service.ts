@@ -47,4 +47,15 @@ export class UsersService {
 
     await this.usersRepository.delete({ id });
   }
+
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email_user', { email_user: email })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+    return user;
+  }
 }

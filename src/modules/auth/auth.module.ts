@@ -14,6 +14,7 @@ import { CarsModule } from '../cars/cars.module';
     CarsModule,
     JwtModule.register({
       global: true,
+      secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '3h' },
     }),
   ],
