@@ -5,11 +5,13 @@ import { AuthController } from './auth.controller';
 import { TokenStrategy } from './token.strategy';
 import { UsersModule } from '../users/users.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { CarsModule } from '../cars/cars.module';
 
 @Module({
   imports: [
     PassportModule,
     UsersModule,
+    CarsModule,
     JwtModule.register({
       global: true,
       signOptions: { expiresIn: '3h' },

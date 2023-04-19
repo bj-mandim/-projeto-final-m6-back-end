@@ -7,33 +7,37 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.repository.create(createUserDto);
-    await this.repository.save(user);
+    const user = this.usersRepository.create(createUserDto);
+    await this.usersRepository.save(user);
 
     return await this.findOne(user.id);
   }
 
   async findAll(): Promise<User[]> {
-    const list = await this.repository.find();
+    const list = await this.usersRepository.find();
 
     return list;
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.repository.findOneBy({ id: id });
-
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id_user', { id_user: id })
+      .getOne();
     if (!user) {
-      throw new NotFoundException(`user not found`);
+      throw new NotFoundException(`User not found`);
     }
 
     return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    await this.repository.update({ id }, updateUserDto);
+    await this.usersRepository.update({ id }, updateUserDto);
 
     return await this.findOne(id);
   }
@@ -41,6 +45,6 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     await this.findOne(id);
 
-    await this.repository.delete({ id });
+    await this.usersRepository.delete({ id });
   }
 }

@@ -6,19 +6,23 @@ import { CreateCarDto, ImageDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { Car } from './entities/car.entity';
 import { Image } from './entities/image.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CarsService {
   constructor(
     @InjectRepository(Car) private repository: Repository<Car>,
     @InjectRepository(Image) private imgRepository: Repository<Image>,
+    private usersService: UsersService,
   ) {}
 
-  async create(createCarDto: CreateCarDto): Promise<Car> {
+  async create(createCarDto: CreateCarDto, userId: string): Promise<Car> {
     createCarDto.fipe_table = Number(createCarDto.fipe_table);
     createCarDto.price = Number(createCarDto.price);
 
-    const car = this.repository.create(createCarDto);
+    const user = await this.usersService.findOne(userId);
+
+    const car = this.repository.create({ ...createCarDto, user: user });
     await this.repository.save(car);
 
     await this.createImg(createCarDto.images, car.id);
@@ -36,6 +40,7 @@ export class CarsService {
     const car = await this.repository
       .createQueryBuilder('car')
       .where('car.id = :id_car', { id_car: id })
+      .leftJoinAndSelect('car.user', 'user')
       .leftJoinAndSelect('car.images', 'images')
       .getOne();
 
@@ -86,5 +91,21 @@ export class CarsService {
       throw new NotFoundException(`Image not found`);
     }
     await this.imgRepository.delete({ id });
+  }
+
+  async findImage(id: string): Promise<Image> {
+    const image = await this.imgRepository
+      .createQueryBuilder('image')
+      .where('image.id = :id_image', { id_image: id })
+      .leftJoinAndSelect('image.car', 'car')
+      .leftJoinAndSelect('car.user', 'user')
+      .getOne();
+
+    if (!image) {
+      throw new NotFoundException(`image not found`);
+    }
+
+    console.log(image.car.user.id);
+    return image;
   }
 }

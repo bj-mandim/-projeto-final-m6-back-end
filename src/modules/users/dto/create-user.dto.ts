@@ -1,43 +1,61 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsString,
+  MaxLength,
+  IsBoolean,
+  IsNotEmpty,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  readonly username: string;
+  @MaxLength(120)
+  name: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly email: string;
+  @MaxLength(120)
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly password: string;
+  @MaxLength(120)
+  password: string;
 
+  @IsNotEmpty()
   @IsBoolean()
-  readonly is_announcer: boolean;
+  is_announcer: boolean;
 
   @IsNotEmpty()
   @IsString()
-  readonly description: string;
+  @MaxLength(120)
+  description: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly phone: string;
+  @MaxLength(15)
+  @MinLength(15)
+  phone: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly cpf: string;
+  @MaxLength(11)
+  @MinLength(11)
+  cpf: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly birth: string;
+  birth: string;
 }
+
 export class LoginUserDto {
   @IsNotEmpty()
   @IsString()
-  readonly email: string;
+  @MaxLength(120)
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly password: string;
+  @MaxLength(120)
+  password: string;
 }
