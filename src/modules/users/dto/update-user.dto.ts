@@ -1,11 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
+import { AddressDto, CreateUserDto } from './create-user.dto';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-  readonly username: string;
-  readonly email: string;
-  readonly description: string;
-  readonly phone: string;
-  readonly cpf: string;
-  readonly birth: string;
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => UpdateAddressDto)
+  address: AddressDto;
 }
+
+export class UpdateAddressDto extends PartialType(AddressDto) {}

@@ -14,32 +14,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { SelfGuard } from '../auth/self.guard';
 
-export const createUserController = async (req: Request, res: Response) => {
-  try {
-    const { ...data } = req.body;
-    const newUser = await createUserService(data);
-    return res.status(201).json(newUser);
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(400).json({
-        message: error.message,
-      });
-    }
-  }
-};
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
-export const listUserController = async (req: Request, res: Response) => {
-  try {
-    const user = await listUserService();
-    return res.status(200).json(user);
-  } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(400).json({
-        message: error.message,
-      });
-    }
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
-};
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
 
   @Get(':id')
   @UseGuards(TokenAuthGuard, SelfGuard)
@@ -52,7 +39,6 @@ export const listUserController = async (req: Request, res: Response) => {
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
-};
 
   @Delete(':id')
   @UseGuards(TokenAuthGuard, SelfGuard)

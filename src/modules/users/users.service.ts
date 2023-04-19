@@ -4,15 +4,23 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Address } from './entities/address.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Address) private addressRepository: Repository<Address>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<any> {
+    const address = this.addressRepository.create(createUserDto.address);
+    await this.addressRepository.save(address);
+
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      address: address,
+    });
     await this.usersRepository.save(user);
 
     return await this.findOne(user.id);
@@ -28,6 +36,7 @@ export class UsersService {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .where('user.id = :id_user', { id_user: id })
+      .leftJoinAndSelect('user.address', 'address')
       .getOne();
     if (!user) {
       throw new NotFoundException(`User not found`);
@@ -37,6 +46,16 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (updateUserDto.address) {
+      await this.addressRepository.update(
+        { id: user.address.id },
+        updateUserDto.address,
+      );
+      delete updateUserDto.address;
+    }
+
     await this.usersRepository.update({ id }, updateUserDto);
 
     return await this.findOne(id);
@@ -52,6 +71,7 @@ export class UsersService {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .where('user.email = :email_user', { email_user: email })
+      .leftJoinAndSelect('user.address', 'address')
       .getOne();
     if (!user) {
       throw new NotFoundException(`User not found`);
