@@ -10,6 +10,6 @@ export class CarOwnerGuard implements CanActivate {
 
     const car = await this.carsService.findOne(request.params.id);
 
-    return car.user.id == request.userId;
+    return car.user.id == request.user.userId;
   }
 }

@@ -4,6 +4,6 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 export class SelfGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    return request.params.id == request.userId;
+    return request.params.id == request.user.userId;
   }
 }
