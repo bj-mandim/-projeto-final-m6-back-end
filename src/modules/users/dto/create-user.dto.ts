@@ -2,9 +2,37 @@ import {
   IsString,
   MaxLength,
   IsBoolean,
+  IsInt,
   IsNotEmpty,
+  ValidateNested,
   MinLength,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class AddressDto {
+  @IsNotEmpty()
+  @IsString()
+  city: string;
+
+  @IsNotEmpty()
+  @IsString()
+  state: string;
+
+  @IsNotEmpty()
+  @IsString()
+  street: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  number: number;
+
+  @IsString()
+  complement: string;
+
+  @IsNotEmpty()
+  @IsString()
+  cep: string;
+}
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -46,6 +74,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   birth: string;
+
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => AddressDto)
+  address: AddressDto;
 }
 
 export class LoginUserDto {

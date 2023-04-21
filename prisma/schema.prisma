@@ -1,0 +1,58 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Car {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brand        String //@db.VarChar(50)
+  model        String //@db.VarChar(50)
+  year         Int
+  fuel         String 
+  km           Int
+  price        Float
+  fipe_table   Float
+  description  String
+  is_active    Boolean         @default(false)   
+  cover_img    String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String          @db.Uuid
+  comment     Comment[]
+  images       Image[]
+}
+
+model Image {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url           String
+  car           Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId         String  @db.Uuid
+}
+
+model Comment {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  comment       String
+  author        User        @relation(fields: [authorId], references: [id])
+  authorId      String      @db.Uuid
+  created_at    DateTime    @default(now())
+  car           Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+  carId         String      @db.Uuid
+}
+
+model User {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String        //@db.VarChar(50)
+  email           String        @unique
+  cpf             String        @unique
+  phone           String
+  date_of_birth   String
+  description     String
+  is_announcer    Boolean
+  password        String
+  car             Car[]
+  comments        Comment[]
+}
