@@ -29,7 +29,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(TokenAuthGuard, SelfGuard)
+  // @UseGuards(TokenAuthGuard, SelfGuard)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }

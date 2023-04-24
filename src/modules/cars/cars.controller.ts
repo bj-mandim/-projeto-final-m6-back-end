@@ -34,13 +34,13 @@ export class CarsController {
   }
 
   @Get()
-  @UseGuards(TokenAuthGuard)
+  // @UseGuards(TokenAuthGuard)
   findAll() {
     return this.carsService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(TokenAuthGuard, CarOwnerGuard)
+  // @UseGuards(TokenAuthGuard, CarOwnerGuard)
   findOne(@Param('id') id: string) {
     return this.carsService.findOne(id);
   }
