@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -48,5 +49,21 @@ export class UsersController {
   @UseGuards(TokenAuthGuard, SelfGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @HttpCode(200)
+  @Post('resetPassword')
+  async sendEmailResetPassword(@Body('email') email: string) {
+    await this.usersService.sendResetEmailPassword(email);
+    return { message: 'Link para redefinição de senha enviado para o email' };
+  }
+
+  @Patch('resetPassword/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body('password') password: string,
+  ) {
+    await this.usersService.resetPassword(password, token);
+    return { message: 'Senha alterada com sucesso' };
   }
 }
