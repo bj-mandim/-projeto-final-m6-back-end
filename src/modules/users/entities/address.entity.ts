@@ -21,5 +21,5 @@ export class Address {
   number: number;
 
   @Column()
-  complement: string;
+  complement?: string;
 }
