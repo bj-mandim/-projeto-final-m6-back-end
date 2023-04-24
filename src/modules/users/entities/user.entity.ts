@@ -43,6 +43,9 @@ export class User {
   @Column()
   birth: string;
 
+  @Column({ nullable: true })
+  reset_token: string;
+
   @OneToMany(() => Car, (car) => car.user, {
     cascade: true,
   })
