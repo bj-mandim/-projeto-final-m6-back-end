@@ -2,6 +2,7 @@ import { LoginUserDto } from './../users/dto/create-user.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,5 +24,10 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload, options),
     };
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(password, salt);
   }
 }

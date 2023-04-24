@@ -8,6 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { AuthService } from 'src/modules/auth/auth.service';
 
 export class AddressDto {
   @IsNotEmpty()
@@ -48,6 +49,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(120)
+  async hashPassword(authService: AuthService): Promise<void> {
+    this.password = await authService.hashPassword(this.password);
+  }
   password: string;
 
   @IsNotEmpty()
