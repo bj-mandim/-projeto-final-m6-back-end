@@ -1,3 +1,4 @@
+import { AuthService } from './../auth/auth.service';
 import {
   Controller,
   Get,
@@ -16,11 +17,14 @@ import { SelfGuard } from '../auth/self.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    await createUserDto.hashPassword(this.authService);
   }
 
   @Get()
