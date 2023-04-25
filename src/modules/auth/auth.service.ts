@@ -18,8 +18,6 @@ export class AuthService {
       user.password,
     );
 
-    console.log(loginUserDto.password);
-    console.log(user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
