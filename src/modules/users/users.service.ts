@@ -6,12 +6,16 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Address } from './entities/address.entity';
 import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
+import { MailService } from 'src/utils/mail.service';
+import { hashSync } from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Address) private addressRepository: Repository<Address>,
+    private mailService: MailService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {
@@ -84,5 +88,44 @@ export class UsersService {
 
   async comparePasswords(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
+
+  async sendResetEmailPassword(email: string) {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email_user', { email_user: email })
+      .leftJoinAndSelect('user.address', 'address')
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    const resetToken = randomUUID();
+
+    await this.usersRepository.update({ email }, { reset_token: resetToken });
+
+    const resetPasswordTemplate = await this.mailService.resetPassword(
+      email,
+      user.name,
+      resetToken,
+    );
+
+    await this.mailService.sendEmail(resetPasswordTemplate);
+  }
+
+  async resetPassword(pass: string, resetToken: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        reset_token: resetToken,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.usersRepository.update(
+      { id: user.id },
+      { password: hashSync(pass, 10), reset_token: null },
+    );
   }
 }
