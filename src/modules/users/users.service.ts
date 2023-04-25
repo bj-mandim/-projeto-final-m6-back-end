@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Address } from './entities/address.entity';
+import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { MailService } from 'src/utils/mail.service';
 import { hashSync } from 'bcryptjs';
@@ -19,10 +20,12 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<any> {
     const address = this.addressRepository.create(createUserDto.address);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     await this.addressRepository.save(address);
 
     const user = this.usersRepository.create({
       ...createUserDto,
+      password: hashedPassword,
       address: address,
     });
     await this.usersRepository.save(user);
@@ -82,6 +85,9 @@ export class UsersService {
     }
     return user;
   }
+
+  async comparePasswords(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
 
   async sendResetEmailPassword(email: string) {
     const user = await this.usersRepository

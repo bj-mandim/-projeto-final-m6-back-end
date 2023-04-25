@@ -2,7 +2,7 @@ import { LoginUserDto } from './../users/dto/create-user.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,8 +12,16 @@ export class AuthService {
 
   async login(loginUserDto: LoginUserDto) {
     const user = await this.usersService.findByEmail(loginUserDto.email);
-    if (user?.password !== loginUserDto.password) {
-      throw new UnauthorizedException();
+
+    const isPasswordValid = await this.usersService.comparePasswords(
+      loginUserDto.password,
+      user.password,
+    );
+
+    console.log(loginUserDto.password);
+    console.log(user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
     }
     const payload = {
       email: user.email,
@@ -21,13 +29,9 @@ export class AuthService {
       is_announcer: user.is_announcer,
     };
     const options: JwtSignOptions = { secret: process.env.SECRET_KEY };
+
     return {
       access_token: this.jwtService.sign(payload, options),
     };
-  }
-
-  async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(password, salt);
   }
 }
