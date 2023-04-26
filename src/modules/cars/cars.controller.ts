@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Request,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 
 import { CarsService } from './cars.service';
@@ -23,9 +25,9 @@ interface iTokenRequest extends Request {
 }
 
 @Controller('cars')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CarsController {
   constructor(private readonly carsService: CarsService) {}
-
   @Post()
   @UseGuards(TokenAuthGuard, AnnouncerGuard)
   create(@Body() createCarDto: CreateCarDto, @Request() req: iTokenRequest) {
