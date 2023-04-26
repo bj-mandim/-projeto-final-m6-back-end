@@ -10,12 +10,18 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   HttpCode,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { SelfGuard } from '../auth/self.guard';
+import { Request } from 'express';
+
+interface iTokenRequest extends Request {
+  user: { userId: string; isAnnouncer: boolean };
+}
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -30,6 +36,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('/profile')
+  @UseGuards(TokenAuthGuard)
+  findProfile(@Req() req: iTokenRequest) {
+    return this.usersService.findOne(req.user.userId);
   }
 
   @Get(':id')

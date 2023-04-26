@@ -88,6 +88,7 @@ export class UsersService {
 
   async comparePasswords(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
+  }
 
   async sendResetEmailPassword(email: string) {
     const user = await this.usersRepository
