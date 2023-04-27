@@ -44,6 +44,7 @@ export class UsersService {
       .createQueryBuilder('user')
       .where('user.id = :id_user', { id_user: id })
       .leftJoinAndSelect('user.address', 'address')
+      .leftJoinAndSelect('user.cars', 'cars')
       .getOne();
     if (!user) {
       throw new NotFoundException(`User not found`);
@@ -109,6 +110,8 @@ export class UsersService {
       user.name,
       resetToken,
     );
+
+    console.log(resetPasswordTemplate);
 
     await this.mailService.sendEmail(resetPasswordTemplate);
   }
