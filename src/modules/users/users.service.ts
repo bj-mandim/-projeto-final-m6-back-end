@@ -112,6 +112,8 @@ export class UsersService {
       resetToken,
     );
 
+    console.log(resetPasswordTemplate);
+
     await this.mailService.sendEmail(resetPasswordTemplate);
   }
 
