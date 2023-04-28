@@ -31,7 +31,12 @@ export class CarsService {
   }
 
   async findAll(): Promise<Car[]> {
-    const list = await this.repository.find();
+    const list = await this.repository
+      .createQueryBuilder('car')
+      .leftJoinAndSelect('car.user', 'user')
+      .leftJoinAndSelect('user.address', 'address')
+      .leftJoinAndSelect('car.images', 'images')
+      .getMany();
 
     return list;
   }
@@ -41,6 +46,7 @@ export class CarsService {
       .createQueryBuilder('car')
       .where('car.id = :id_car', { id_car: id })
       .leftJoinAndSelect('car.user', 'user')
+      .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('car.images', 'images')
       .getOne();
 
