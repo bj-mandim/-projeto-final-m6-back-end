@@ -45,6 +45,7 @@ export class UsersService {
       .where('user.id = :id_user', { id_user: id })
       .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('user.cars', 'cars')
+      .leftJoinAndSelect('cars.images', 'images')
       .getOne();
     if (!user) {
       throw new NotFoundException(`User not found`);
