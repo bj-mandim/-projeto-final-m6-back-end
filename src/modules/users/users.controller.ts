@@ -45,7 +45,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(TokenAuthGuard)
   // @UseGuards(TokenAuthGuard, SelfGuard)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
