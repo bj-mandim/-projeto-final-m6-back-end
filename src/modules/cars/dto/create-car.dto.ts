@@ -71,6 +71,10 @@ export class CreateCarDto {
   @ValidateNested({ each: true })
   @Type(() => ImageDto)
   images: ImageDto[];
+
+  @ValidateNested({ each: true })
+  @Type(() => CommentDto)
+  comment: CommentDto[];
 }
 
 export class ImageDto {
@@ -84,4 +88,15 @@ export class ImageListDto {
   @ValidateNested({ each: true })
   @Type(() => ImageDto)
   images: ImageDto[];
+}
+
+export class CommentDto {
+  @IsString()
+  comment: string;
+}
+
+export class CommentListDto {
+  @ValidateNested({ each: true })
+  @Type(() => CommentDto)
+  comments: CommentDto;
 }
