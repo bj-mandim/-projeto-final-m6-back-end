@@ -14,7 +14,7 @@ export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   comment: string;
 
   @CreateDateColumn()

@@ -7,12 +7,19 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { Car } from './entities/car.entity';
 import { Image } from './entities/image.entity';
 import { UsersService } from '../users/users.service';
+import { Comment } from './entities/comment.entity';
+import { CommentDto } from './dto/create-car.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CarsService {
+  deleteComment(id: string) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(Car) private repository: Repository<Car>,
     @InjectRepository(Image) private imgRepository: Repository<Image>,
+    @InjectRepository(Comment) private commentRepository: Repository<Comment>,
     private usersService: UsersService,
   ) {}
 
@@ -36,6 +43,7 @@ export class CarsService {
       .leftJoinAndSelect('car.user', 'user')
       .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('car.images', 'images')
+      .leftJoinAndSelect('car.comments', 'comments')
       .getMany();
 
     return list;
@@ -48,6 +56,7 @@ export class CarsService {
       .leftJoinAndSelect('car.user', 'user')
       .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('car.images', 'images')
+      .leftJoinAndSelect('car.comments', 'comments')
       .getOne();
 
     if (!car) {
@@ -113,5 +122,62 @@ export class CarsService {
 
     console.log(image.car.user.id);
     return image;
+  }
+
+  async createComment(comments: CommentDto, carId: string): Promise<Comment> {
+    const car = await this.findOne(carId);
+
+    const coment = await this.commentRepository.create({
+      ...comments,
+      car: car,
+    });
+
+    await this.commentRepository.save(coment);
+
+    const comment = await this.commentRepository
+      .createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.user', 'user')
+      .leftJoinAndSelect('comments.car', 'car')
+      .where('comments.car.id = :id_car', { id_car: carId })
+      .getOne();
+
+    return comment;
+  }
+
+  async findComment(id: string): Promise<Comment> {
+    const comment = await this.commentRepository
+      .createQueryBuilder('comment')
+      .where('comment.id = :id_comment', { id_comment: id })
+      .leftJoinAndSelect('comment.car', 'car')
+      .leftJoinAndSelect('comment.user', 'user')
+      .getOne();
+
+    if (!comment) {
+      throw new NotFoundException(`Comment not found`);
+    }
+
+    console.log(comment.car.user);
+    return comment;
+  }
+
+  async removeComment(id: string): Promise<void> {
+    const comment = await this.commentRepository
+      .createQueryBuilder('comment')
+      .where('comment.id = :id_comment', { id_comment: id })
+      .getOne();
+
+    if (!comment) {
+      throw new NotFoundException(`Comment not found`);
+    }
+    await this.commentRepository.delete({ id });
+  }
+
+  async updateComment(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<Comment> {
+    await this.commentRepository.update({ id }, updateCommentDto);
+
+    return await this.findComment(id);
   }
 }
