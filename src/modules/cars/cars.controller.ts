@@ -14,7 +14,12 @@ import {
 import { ApiTags, ApiBearerAuth, ApiResponse, OmitType } from '@nestjs/swagger';
 
 import { CarsService } from './cars.service';
-import { CreateCarDto, ImageListDto } from './dto/create-car.dto';
+import {
+  CreateCarDto,
+  ImageListDto,
+  CommentListDto,
+  CommentDto,
+} from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { AnnouncerGuard } from '../auth/announcer.guard';
@@ -22,6 +27,7 @@ import { CarOwnerGuard } from '../auth/car-owner.guard';
 import { ImageOwnerGuard } from '../auth/image-owner.guard';
 import { Car } from './entities/car.entity';
 import { Image } from './entities/image.entity';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 interface iTokenRequest extends Request {
   user: { userId: string; isAnnouncer: boolean };
@@ -84,5 +90,31 @@ export class CarsController {
   @UseGuards(TokenAuthGuard, ImageOwnerGuard)
   deleteImg(@Param('id') id: string) {
     return this.carsService.removeImg(id);
+  }
+
+  @Post(':id/comments')
+  @UseGuards(TokenAuthGuard)
+  createComment(@Body() commentListDto: CommentDto, @Param('id') id: string) {
+    return this.carsService.createComment(commentListDto, id);
+  }
+
+  @Get(':id/comments')
+  findComment(@Param('id') id: string) {
+    return this.carsService.findComment(id);
+  }
+
+  @Delete(':id/comments')
+  @UseGuards(TokenAuthGuard)
+  removeComment(@Param('id') id: string) {
+    return this.carsService.removeComment(id);
+  }
+
+  @Patch(':id/comments')
+  @UseGuards(TokenAuthGuard)
+  updateComment(
+    @Param('id') id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+  ) {
+    return this.carsService.updateComment(id, updateCommentDto);
   }
 }

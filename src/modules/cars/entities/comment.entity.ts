@@ -17,7 +17,7 @@ export class Comment {
   id: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ nullable: true })
   comment: string;
 
   @ApiProperty()
