@@ -12,51 +12,63 @@ import {
   HttpCode,
   Req,
 } from '@nestjs/common';
+import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { SelfGuard } from '../auth/self.guard';
 import { Request } from 'express';
+import { User } from './entities/user.entity';
 
 interface iTokenRequest extends Request {
   user: { userId: string; isAnnouncer: boolean };
 }
 
+@ApiTags('Users')
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @ApiResponse({ status: 201, type: User })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
+  @ApiResponse({ status: 200, type: [User] })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get('/profile')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: User })
   @UseGuards(TokenAuthGuard)
   findProfile(@Req() req: iTokenRequest) {
     return this.usersService.findOne(req.user.userId);
   }
 
   @Get(':id')
-  // @UseGuards(TokenAuthGuard, SelfGuard)
+  @ApiResponse({ status: 200, type: User })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: User })
   @UseGuards(TokenAuthGuard, SelfGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 204 })
   @UseGuards(TokenAuthGuard, SelfGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
