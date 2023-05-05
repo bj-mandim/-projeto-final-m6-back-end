@@ -57,6 +57,7 @@ export class CarsService {
       .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('car.images', 'images')
       .leftJoinAndSelect('car.comments', 'comments')
+      .leftJoinAndSelect('comments.user', 'comment_user')
       .getOne();
 
     if (!car) {
@@ -124,12 +125,18 @@ export class CarsService {
     return image;
   }
 
-  async createComment(comments: CommentDto, carId: string): Promise<Comment> {
+  async createComment(
+    comments: CommentDto,
+    carId: string,
+    userId: string,
+  ): Promise<Comment> {
     const car = await this.findOne(carId);
+    const user = await this.usersService.findOne(userId);
 
     const coment = await this.commentRepository.create({
       ...comments,
       car: car,
+      user: user,
     });
 
     await this.commentRepository.save(coment);
@@ -155,9 +162,18 @@ export class CarsService {
     if (!comment) {
       throw new NotFoundException(`Comment not found`);
     }
-
-    console.log(comment.car.user);
     return comment;
+  }
+
+  async findCarComments(id: string): Promise<Comment[]> {
+    const comments = await this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.car', 'car')
+      .where('car.id = :id_car', { id_car: id })
+      .leftJoinAndSelect('comment.user', 'user')
+      .getMany();
+
+    return comments;
   }
 
   async removeComment(id: string): Promise<void> {

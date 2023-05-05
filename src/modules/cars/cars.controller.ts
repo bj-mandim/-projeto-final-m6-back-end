@@ -79,13 +79,17 @@ export class CarsController {
 
   @Post(':id/comments')
   @UseGuards(TokenAuthGuard)
-  createComment(@Body() commentListDto: CommentDto, @Param('id') id: string) {
-    return this.carsService.createComment(commentListDto, id);
+  createComment(
+    @Body() commentListDto: CommentDto,
+    @Param('id') id: string,
+    @Request() req: iTokenRequest,
+  ) {
+    return this.carsService.createComment(commentListDto, id, req.user.userId);
   }
 
   @Get(':id/comments')
-  findComment(@Param('id') id: string) {
-    return this.carsService.findComment(id);
+  findCarComments(@Param('id') id: string) {
+    return this.carsService.findCarComments(id);
   }
 
   @Delete(':id/comments')
@@ -101,5 +105,10 @@ export class CarsController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     return this.carsService.updateComment(id, updateCommentDto);
+  }
+
+  @Get('comments/:id')
+  findComment(@Param('id') id: string) {
+    return this.carsService.findComment(id);
   }
 }
