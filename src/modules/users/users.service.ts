@@ -65,7 +65,7 @@ export class UsersService {
       delete updateUserDto.address;
     }
 
-    if (Object.keys(UpdateUserDto).length) {
+    if (Object.keys(updateUserDto).length) {
       await this.usersRepository.update({ id }, updateUserDto);
     }
 
