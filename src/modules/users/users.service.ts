@@ -65,7 +65,9 @@ export class UsersService {
       delete updateUserDto.address;
     }
 
-    await this.usersRepository.update({ id }, updateUserDto);
+    if (Object.keys(UpdateUserDto).length) {
+      await this.usersRepository.update({ id }, updateUserDto);
+    }
 
     return await this.findOne(id);
   }
