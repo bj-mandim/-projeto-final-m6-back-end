@@ -11,15 +11,10 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiResponse, OmitType } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 
 import { CarsService } from './cars.service';
-import {
-  CreateCarDto,
-  ImageListDto,
-  CommentListDto,
-  CommentDto,
-} from './dto/create-car.dto';
+import { CreateCarDto, ImageListDto, CommentDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { AnnouncerGuard } from '../auth/announcer.guard';
@@ -28,6 +23,7 @@ import { ImageOwnerGuard } from '../auth/image-owner.guard';
 import { Car } from './entities/car.entity';
 import { Image } from './entities/image.entity';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Comment } from './entities/comment.entity';
 
 interface iTokenRequest extends Request {
   user: { userId: string; isAnnouncer: boolean };
@@ -93,6 +89,8 @@ export class CarsController {
   }
 
   @Post(':id/comments')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, type: Comment })
   @UseGuards(TokenAuthGuard)
   createComment(
     @Body() commentListDto: CommentDto,
@@ -103,17 +101,22 @@ export class CarsController {
   }
 
   @Get(':id/comments')
+  @ApiResponse({ status: 200, type: [Comment] })
   findCarComments(@Param('id') id: string) {
     return this.carsService.findCarComments(id);
   }
 
-  @Delete(':id/comments')
+  @Delete('comments/:id')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 204 })
   @UseGuards(TokenAuthGuard)
   removeComment(@Param('id') id: string) {
     return this.carsService.removeComment(id);
   }
 
-  @Patch(':id/comments')
+  @Patch('comments/:id')
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, type: Comment })
   @UseGuards(TokenAuthGuard)
   updateComment(
     @Param('id') id: string,
@@ -123,6 +126,7 @@ export class CarsController {
   }
 
   @Get('comments/:id')
+  @ApiResponse({ status: 200, type: Comment })
   findComment(@Param('id') id: string) {
     return this.carsService.findComment(id);
   }

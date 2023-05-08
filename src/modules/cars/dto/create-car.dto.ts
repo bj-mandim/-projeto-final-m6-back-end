@@ -88,11 +88,13 @@ export class ImageListDto {
 }
 
 export class CommentDto {
+  @ApiProperty()
   @IsString()
   comment: string;
 }
 
 export class CommentListDto {
+  @ApiProperty({ type: [CommentDto] })
   @ValidateNested({ each: true })
   @Type(() => CommentDto)
   comments: CommentDto;
