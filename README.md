@@ -5,6 +5,8 @@ Essa é a Parte Back-End do projeto final full stack que foi realizado no sexto 
 O objetivo desse projeto era desenvolver uma aplicação e-commerce de veículos e automóveis que além da venda de produtos, também fosse possivel a comunicação
 com outros membros a partir da página dos Comentários.
 
+Repositório Front-end: https://github.com/bj-mandim/projeto-final-m6-front-end
+
 ## Tecnologias utilizadas:
 
 - Nest;
@@ -15,18 +17,14 @@ com outros membros a partir da página dos Comentários.
 
 ## Bibliotecas utilizadas:
 
-- cli;
-- testing";
 - mapped-types;
-- platform-express;
-- cors;
-- dotenv;
 - typeORM;
-- common;
 - class-transformer;
 - class-validator;
 - pg
-- reflect-metadata;
+- swagger
+- momentjs
+- jsonwebtoken
 
 ### Para fazer o clone do repositório e rodar o projeto localmente:
 
@@ -35,7 +33,12 @@ com outros membros a partir da página dos Comentários.
 3. Depois de clonar, abra o terminal na pasta do projeto e execute `yarn install` para instalar as dependências necessárias;
 4. Por fim, ainda no terminal, execute o comando `yarn dev` para rodar o projeto localmente.
 
-### Projeto Criado e desenvolvido por: 
+### Para acessar documentação(swagger)
+
+1. Rode o projeto
+2. Acesse `localhost:3001/api`
+
+### Projeto Criado e desenvolvido por:
 
 1. Amanda: https://github.com/AmandaIsMe-alt
 2. Gabriel: https://github.com/Dukine
