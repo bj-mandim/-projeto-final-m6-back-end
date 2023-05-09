@@ -168,6 +168,7 @@ export class CarsService {
   async findCarComments(id: string): Promise<Comment[]> {
     const comments = await this.commentRepository
       .createQueryBuilder('comment')
+      .orderBy('created_at', 'DESC')
       .leftJoinAndSelect('comment.car', 'car')
       .where('car.id = :id_car', { id_car: id })
       .leftJoinAndSelect('comment.user', 'user')
