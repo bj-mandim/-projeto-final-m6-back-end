@@ -15,7 +15,11 @@ import {
 import { ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  CreateUserDto,
+  ResetPassDto,
+  ResetPassEmailDto,
+} from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { TokenAuthGuard } from '../auth/token-auth.guard';
 import { SelfGuard } from '../auth/self.guard';
@@ -76,17 +80,31 @@ export class UsersController {
 
   @HttpCode(200)
   @Post('resetPassword')
-  async sendEmailResetPassword(@Body('email') email: string) {
-    await this.usersService.sendResetEmailPassword(email);
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: {
+        message: 'Link para redefinição de senha enviado para o email',
+      },
+    },
+  })
+  async sendEmailResetPassword(@Body() resetEmailDto: ResetPassEmailDto) {
+    await this.usersService.sendResetEmailPassword(resetEmailDto);
     return { message: 'Link para redefinição de senha enviado para o email' };
   }
 
   @Patch('resetPassword/:token')
+  @ApiResponse({
+    status: 200,
+    schema: {
+      example: { message: 'Senha alterada com sucesso' },
+    },
+  })
   async resetPassword(
     @Param('token') token: string,
-    @Body('password') password: string,
+    @Body() resetPassDto: ResetPassDto,
   ) {
-    await this.usersService.resetPassword(password, token);
+    await this.usersService.resetPassword(resetPassDto, token);
     return { message: 'Senha alterada com sucesso' };
   }
 }
