@@ -22,8 +22,8 @@ export class MailService {
         subject,
         html: text,
       })
-      .then(() => {
-        console.log('veio?');
+      .then((res) => {
+        return res;
       })
       .catch((err) => {
         console.log(err);
