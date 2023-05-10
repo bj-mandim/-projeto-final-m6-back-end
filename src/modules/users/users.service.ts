@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  CreateUserDto,
+  ResetPassDto,
+  ResetPassEmailDto,
+} from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -94,32 +98,26 @@ export class UsersService {
     return await bcrypt.compare(password, hash);
   }
 
-  async sendResetEmailPassword(email: string) {
-    const user = await this.usersRepository
-      .createQueryBuilder('user')
-      .where('user.email = :email_user', { email_user: email })
-      .leftJoinAndSelect('user.address', 'address')
-      .getOne();
-    if (!user) {
-      throw new NotFoundException(`User not found`);
-    }
+  async sendResetEmailPassword(resetEmailDto: ResetPassEmailDto) {
+    const user = await this.findByEmail(resetEmailDto.email);
 
     const resetToken = randomUUID();
 
-    await this.usersRepository.update({ email }, { reset_token: resetToken });
+    await this.usersRepository.update(
+      { id: user.id },
+      { reset_token: resetToken },
+    );
 
     const resetPasswordTemplate = await this.mailService.resetPassword(
-      email,
+      user.email,
       user.name,
       resetToken,
     );
 
-    console.log(resetPasswordTemplate);
-
     await this.mailService.sendEmail(resetPasswordTemplate);
   }
 
-  async resetPassword(pass: string, resetToken: string) {
+  async resetPassword(resetPassDto: ResetPassDto, resetToken: string) {
     const user = await this.usersRepository.findOne({
       where: {
         reset_token: resetToken,
@@ -132,7 +130,7 @@ export class UsersService {
 
     await this.usersRepository.update(
       { id: user.id },
-      { password: hashSync(pass, 10), reset_token: null },
+      { password: hashSync(resetPassDto.password, 10), reset_token: null },
     );
   }
 }

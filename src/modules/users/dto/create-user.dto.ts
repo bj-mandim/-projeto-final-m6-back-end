@@ -110,3 +110,19 @@ export class LoginUserDto {
   @MaxLength(120)
   password: string;
 }
+
+export class ResetPassEmailDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(120)
+  email: string;
+}
+
+export class ResetPassDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(120)
+  password: string;
+}
