@@ -68,6 +68,10 @@ export class CreateCarDto {
   @IsBoolean()
   is_active: boolean;
 
+  @ApiProperty()
+  @IsBoolean()
+  is_promotion: boolean;
+
   @ApiProperty({ type: [ImageDto] })
   @IsNotEmpty()
   @ValidateNested({ each: true })
