@@ -43,7 +43,6 @@ export class CarsService {
       .leftJoinAndSelect('car.user', 'user')
       .leftJoinAndSelect('user.address', 'address')
       .leftJoinAndSelect('car.images', 'images')
-      .leftJoinAndSelect('car.comments', 'comments')
       .getMany();
 
     return list;
