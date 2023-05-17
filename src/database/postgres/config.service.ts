@@ -21,6 +21,16 @@ class ConfigService {
   }
 
   public getTypeOrmConfig(): TypeOrmModuleOptions {
+    if (process.env.ENV == 'prod') {
+      return {
+        type: 'postgres',
+        url: process.env.DB_URL,
+        synchronize: false,
+        logging: true,
+        entities: ['dist/**/*.entity.js'],
+      };
+    }
+
     return {
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -40,6 +50,9 @@ const configService = new ConfigService(process.env).ensureValues([
   'POSTGRES_USER',
   'POSTGRES_PASSWORD',
   'POSTGRES_DATABASE',
+  // 'ENV',
+  // 'DB_URL',
+  'SECRET_KEY',
 ]);
 
 export { configService };
