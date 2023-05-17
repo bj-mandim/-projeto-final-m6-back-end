@@ -1,7 +1,11 @@
 # Motors Shop - API
+# Motors Shop - API
 
 Essa é a Parte Back-End do projeto final full stack que foi realizado no sexto módulo do curso de **Formação em Desenvolvimento Full Stack da Kenzie Academy Brasil**.
+Essa é a Parte Back-End do projeto final full stack que foi realizado no sexto módulo do curso de **Formação em Desenvolvimento Full Stack da Kenzie Academy Brasil**.
 
+O objetivo desse projeto era desenvolver uma aplicação e-commerce de veículos e automóveis que além da venda de produtos, também fosse possivel a comunicação
+com outros membros a partir da página dos Comentários.
 O objetivo desse projeto era desenvolver uma aplicação e-commerce de veículos e automóveis que além da venda de produtos, também fosse possivel a comunicação
 com outros membros a partir da página dos Comentários.
 
