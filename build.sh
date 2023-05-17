@@ -2,5 +2,5 @@
 # exit on error
 set -o errexit
 
-yarn
+yarn install --ignore-platform
 yarn build
