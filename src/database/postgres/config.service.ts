@@ -25,6 +25,10 @@ class ConfigService {
       return {
         type: 'postgres',
         url: process.env.DB_URL,
+        host: process.env.POSTGRES_HOST,
+        username: process.env.POSTGRES_USER,
+        password: String(process.env.POSTGRES_PASSWORD),
+        database: process.env.POSTGRES_DATABASE,
         synchronize: false,
         logging: true,
         entities: ['dist/**/*.entity.js'],
