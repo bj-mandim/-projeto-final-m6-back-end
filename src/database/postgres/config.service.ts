@@ -24,7 +24,7 @@ class ConfigService {
     if (process.env.ENV == 'prod') {
       return {
         type: 'postgres',
-        url: process.env.DB_URL,
+        // url: process.env.DB_URL,
         host: process.env.POSTGRES_HOST,
         username: process.env.POSTGRES_USER,
         password: String(process.env.POSTGRES_PASSWORD),
