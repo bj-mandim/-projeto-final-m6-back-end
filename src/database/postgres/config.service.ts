@@ -26,18 +26,12 @@ class ConfigService {
         type: 'postgres',
         // url: process.env.DB_URL,
         host: process.env.POSTGRES_HOST,
+        port: Number(process.env.POSTGRES_PORT),
         username: process.env.POSTGRES_USER,
         password: String(process.env.POSTGRES_PASSWORD),
         database: process.env.POSTGRES_DATABASE,
-        synchronize: false,
-        logging: true,
         entities: ['dist/**/*.entity.js'],
-        migrationsRun: false,
-        migrations: ['dist/migration/*.js'],
-        //@ts-expect-error cli
-        cli: {
-          migrationsDir: 'migration',
-        },
+        synchronize: true,
       };
     }
 
