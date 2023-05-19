@@ -1,5 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,7 +20,7 @@ class ConfigService {
     return this;
   }
 
-  public getTypeOrmConfig(): PostgresConnectionOptions {
+  public getTypeOrmConfig(): TypeOrmModuleOptions {
     if (process.env.ENV == 'prod') {
       return {
         type: 'postgres',
@@ -35,6 +34,10 @@ class ConfigService {
         entities: ['dist/**/*.entity.js'],
         migrationsRun: false,
         migrations: ['dist/migration/*.js'],
+        //@ts-expect-error cli
+        cli: {
+          migrationsDir: 'migration',
+        },
       };
     }
 
