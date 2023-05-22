@@ -57,6 +57,10 @@ export class Car {
   @Column({ default: true })
   is_active: boolean;
 
+  @ApiProperty()
+  @Column({ default: false })
+  is_promotion: boolean;
+
   @ApiProperty({ type: () => [Image] })
   @OneToMany(() => Image, (image) => image.car, {
     eager: true,
